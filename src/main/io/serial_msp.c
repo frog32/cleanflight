@@ -190,8 +190,8 @@ const char *boardIdentifier = TARGET_BOARD_IDENTIFIER;
 #define MSP_LED_STRIP_CONFIG            48
 #define MSP_SET_LED_STRIP_CONFIG        49
 
-#define MSP_RSSI_CONFIG                 50
-#define MSP_SET_RSSI_CONFIG             51
+#define MSP_RX_VALUES                   50
+#define MSP_SET_RX_VALUES               51
 
 #define MSP_ADJUSTMENT_RANGES           52
 #define MSP_SET_ADJUSTMENT_RANGE        53
@@ -1055,17 +1055,17 @@ static bool processOutCommand(uint8_t cmdMSP)
         break;
 
     case MSP_RX_CONFIG:
-        headSerialReply(8);
+        headSerialReply(3);
+        serialize8(masterConfig.rxConfig.spektrum_sat_bind);
         serialize8(masterConfig.rxConfig.serialrx_provider);
+        serialize8(masterConfig.rxConfig.rssi_channel);
+        break;
+
+    case MSP_RX_VALUES:
+        headSerialReply(6);
         serialize16(masterConfig.rxConfig.maxcheck);
         serialize16(masterConfig.rxConfig.midrc);
         serialize16(masterConfig.rxConfig.mincheck);
-        serialize8(masterConfig.rxConfig.spektrum_sat_bind);
-        break;
-
-    case MSP_RSSI_CONFIG:
-        headSerialReply(1);
-        serialize8(masterConfig.rxConfig.rssi_channel);
         break;
 
     case MSP_RX_MAP:
@@ -1405,14 +1405,14 @@ static bool processInCommand(void)
 
     case MSP_SET_RX_CONFIG:
         masterConfig.rxConfig.serialrx_provider = read8();
+        masterConfig.rxConfig.spektrum_sat_bind = read8();
+        masterConfig.rxConfig.rssi_channel = read8();
+        break;
+
+    case MSP_SET_RX_VALUES:
         masterConfig.rxConfig.maxcheck = read16();
         masterConfig.rxConfig.midrc = read16();
         masterConfig.rxConfig.mincheck = read16();
-        masterConfig.rxConfig.spektrum_sat_bind = read8();
-        break;
-
-    case MSP_SET_RSSI_CONFIG:
-        masterConfig.rxConfig.rssi_channel = read8();
         break;
 
     case MSP_SET_RX_MAP:
